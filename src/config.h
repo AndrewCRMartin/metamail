@@ -16,11 +16,11 @@ WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
 /* This is the top-level configuration file for the metamail distribution. */
 /* If your compiler does not automatically do so, you may wish to 
       add a #define here that defines your system type, e.g.
-      #define LINUX
       #define SYSV 
       #define MSDOS
       #define AMIGA
 */
+#define LINUX
 
 #ifdef AIX
 #define SYSV

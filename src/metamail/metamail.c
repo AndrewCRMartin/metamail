@@ -25,72 +25,75 @@ WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
 #include <sys/stat.h>
 #include <config.h>
 #include <patchlevel.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef BORLAND
-#define F_OK 0
-extern unsigned _stklen = 16384;
-extern char *mktemp(char *);
-#define WRITE_BINARY	"w"
+   #define F_OK 0
+   extern unsigned _stklen = 16384;
+   extern char *mktemp(char *);
+   #define WRITE_BINARY	"w"
 #else /* BORLAND */
-#ifdef MICROSOFT
-#include <malloc.h>
-#include <stdlib.h>
-#include <time.h>
-#include <signal.h>
-#define F_OK 0
-#else
-#include <pwd.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/file.h>
-#include <signal.h>
+   #ifdef MICROSOFT
+      #include <malloc.h>
+      #include <stdlib.h>
+      #include <time.h>
+      #include <signal.h>
+      #define F_OK 0
+   #else
+      #include <pwd.h>
+      #include <sys/time.h>
+      #include <sys/types.h>
+      #include <sys/file.h>
+      #include <signal.h>
 
-#ifndef AMIGA
-#ifdef SYSV
-#include <termio.h>
-#include <unistd.h>
-#else /* SYSV */
-#include <sgtty.h>
-#endif /* SYSV */
-#endif /* AMIGA */
-#endif /* MICROSOFT */
+      #ifndef AMIGA
+         #ifdef SYSV
+            #include <termio.h>
+            #include <unistd.h>
+         #else /* SYSV */
+            #include <sgtty.h>
+         #endif /* SYSV */
+      #endif /* AMIGA */
+   #endif /* MICROSOFT */
 #endif /* BORLAND */
 
 #ifdef SYSV
-#define LPRTEMPLATE "lp %s"
-#define LPRCOMMAND "lp"
+   #define LPRTEMPLATE "lp %s"
+   #define LPRCOMMAND "lp"
 #else
-#define LPRTEMPLATE "lpr %s"
-#define LPRCOMMAND "lpr"
+   #define LPRTEMPLATE "lpr %s"
+   #define LPRCOMMAND "lpr"
 #endif
+
 #ifdef MSDOS
-#define CATCOMMAND  "cat"
-#define CATTEMPLATE "cat %s"
-#define METAMAIL    "metamail"
-#define TMPFILE_NAME_SIZE   128
-#define MAX_FILE_NAME_SIZE 128
-#define WRITE_BINARY	"wb"
+   #define CATCOMMAND  "cat"
+   #define CATTEMPLATE "cat %s"
+   #define METAMAIL    "metamail"
+   #define TMPFILE_NAME_SIZE   128
+   #define MAX_FILE_NAME_SIZE 128
+   #define WRITE_BINARY	"wb"
 #else /* MSDOS */
-#ifdef AMIGA
-extern char *MkRmScript();
-#ifndef F_OK
-#define F_OK (0)
-#endif
-#define CATCOMMAND  "Type"
-#define CATTEMPLATE "Type %s"
-#define METAMAIL    "metamail <*"
-#define TMPFILE_NAME_SIZE     50
-#define MAX_FILE_NAME_SIZE 256
-#define WRITE_BINARY	"w"
-#else /* AMIGA */
-extern char **environ, *gets();
-#define CATCOMMAND  "cat"
-#define CATTEMPLATE "cat %s"
-#define METAMAIL    "metamail"
-#define TMPFILE_NAME_SIZE   1000
-#define MAX_FILE_NAME_SIZE 1000
-#define WRITE_BINARY	"w"
-#endif /* AMIGA */
+   #ifdef AMIGA
+      extern char *MkRmScript();
+      #ifndef F_OK
+         #define F_OK (0)
+      #endif
+      #define CATCOMMAND  "Type"
+      #define CATTEMPLATE "Type %s"
+      #define METAMAIL    "metamail <*"
+      #define TMPFILE_NAME_SIZE     50
+      #define MAX_FILE_NAME_SIZE 256
+      #define WRITE_BINARY	"w"
+   #else /* AMIGA */
+      extern char **environ, *gets();
+      #define CATCOMMAND  "cat"
+      #define CATTEMPLATE "cat %s"
+      #define METAMAIL    "metamail"
+      #define TMPFILE_NAME_SIZE   1000
+      #define MAX_FILE_NAME_SIZE 1000
+      #define WRITE_BINARY	"w"
+   #endif /* AMIGA */
 #endif /* MSDOS */
 
 #ifndef NO_RLIMITS
@@ -100,10 +103,6 @@ extern char **environ, *gets();
 #define CMDSIZE 1200 /* Maximum size of command to execute */
 
 #define LINE_BUF_SIZE       2000
-#ifndef MICROSOFT
-extern char *malloc();
-extern char *realloc();
-#endif
 extern char *getenv();
 extern char *index();
 extern char *rindex();
@@ -192,7 +191,11 @@ void PrintHeader();
 void ConsumeRestOfPart();
 void ParseContentParameters();
 
-sigtype cleanup();
+#ifdef LINUX
+   sighandler_t cleanup();
+#else
+   sigtype cleanup();
+#endif
 
 char *Cleanse(s) /* no leading or trailing space, all lower case */
 char *s;
